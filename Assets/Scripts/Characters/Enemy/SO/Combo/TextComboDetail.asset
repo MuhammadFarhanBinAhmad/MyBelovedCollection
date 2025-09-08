@@ -24,19 +24,19 @@ MonoBehaviour:
   - requisite: 9
     levelName: Awe-Inspiring
     color: {r: 0, g: 0.9033842, b: 1, a: 1}
-    sizePercent: 150
+    sizePercent: 140
   - requisite: 12
     levelName: AweInspiring
     color: {r: 0.45573044, g: 0, b: 1, a: 1}
-    sizePercent: 175
+    sizePercent: 170
   - requisite: 15
     levelName: Stunning
     color: {r: 1, g: 0.82728094, b: 0.43867922, a: 1}
-    sizePercent: 200
+    sizePercent: 190
   text_duration: 0.1
-  level_sizeStart: 25
-  level_sizePeak: 30
-  level_sizeEnd: 20
-  counter_sizeStart: 18
-  counter_sizePeak: 20
-  counter_sizeEnd: 16
+  level_sizeStart: 50
+  level_sizePeak: 80
+  level_sizeEnd: 64
+  counter_sizeStart: 20
+  counter_sizePeak: 60
+  counter_sizeEnd: 40

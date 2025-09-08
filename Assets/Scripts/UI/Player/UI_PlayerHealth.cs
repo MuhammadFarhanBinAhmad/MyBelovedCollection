@@ -5,7 +5,6 @@ using TMPro;
 public class UI_PlayerHealth : MonoBehaviour, I_UIObserver
 {
 
-    PlayerManager _PlayerManager;
     UIManager _UIManager;
 
     [Header("PlayerUI")]
@@ -14,15 +13,13 @@ public class UI_PlayerHealth : MonoBehaviour, I_UIObserver
 
     public void UpdatePlayerUI()
     {
-        _HealthText.text = _PlayerManager._Health.ToString() + " / " +_PlayerManager._BaseHealth.ToString();
-        _HealthBar.fillAmount = (float)((float)_PlayerManager._Health / (float)_PlayerManager._BaseHealth);
+        _HealthText.text = PlayerManager.Instance._Health.ToString() + " / " + PlayerManager.Instance._BaseHealth.ToString();
+        _HealthBar.fillAmount = (float)((float)PlayerManager.Instance._Health / (float)PlayerManager.Instance._BaseHealth);
     }
 
     void OnEnable()
     {
         _UIManager = FindAnyObjectByType<UIManager>();
-        _PlayerManager = FindAnyObjectByType<PlayerManager>();
-
         _UIManager.AddObserver(this);
     }
     private void OnDisable()

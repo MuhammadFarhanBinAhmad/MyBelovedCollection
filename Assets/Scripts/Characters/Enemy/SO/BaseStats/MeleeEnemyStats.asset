@@ -17,3 +17,4 @@ MonoBehaviour:
   _attackRate: 2
   _stopDistance: 3
   _viewrange: 10
+  _waitDuration: 2

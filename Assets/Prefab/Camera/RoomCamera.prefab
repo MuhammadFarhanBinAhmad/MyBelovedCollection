@@ -94,7 +94,7 @@ MonoBehaviour:
   CameraDistance: 10
   DeadZoneDepth: 0
   Composition:
-    ScreenPosition: {x: 0, y: 0}
+    ScreenPosition: {x: 0, y: 0.2}
     DeadZone:
       Enabled: 0
       Size: {x: 0.1, y: 0.15}
@@ -146,10 +146,10 @@ MonoBehaviour:
   maxRotationAngle: 10
   traumaDecay: 1
   traumaPower: 2
-  frequency: 25
-  _traumaValue: 0
+  frequency: 15
+  _traumaValue: 1
   trauma_enemyOnHit: 0.25
-  trauma_enemyOnDeath: 0.75
+  trauma_enemyOnDeath: 0.5
 --- !u!114 &1121337826437400986
 MonoBehaviour:
   m_ObjectHideFlags: 0

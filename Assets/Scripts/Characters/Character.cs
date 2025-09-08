@@ -4,11 +4,11 @@ public class Character : MonoBehaviour
 {
     [SerializeField]SO_Character SO_character;
 
-    public int _BaseHealth;
-    public int _Health;
+     internal int _BaseHealth;
+     internal int _Health;
 
-    public int _BaseSpeed;
-    public int _Speed;
+     internal int _BaseSpeed;
+     internal int _Speed;
 
     public void OnEnable()
     {
@@ -18,12 +18,6 @@ public class Character : MonoBehaviour
         _Health = _BaseHealth;
         _Speed = _BaseSpeed;
     }
-
-    public void Start()
-    {
-
-    }
-
     public void TakeDamage(int dmg)
     {
         _Health -= dmg;

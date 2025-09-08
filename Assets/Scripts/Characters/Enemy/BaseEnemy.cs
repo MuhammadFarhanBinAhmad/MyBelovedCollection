@@ -1,8 +1,13 @@
 using System;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public abstract class BaseEnemy : MonoBehaviour
 {
+
+    [SerializeField]internal SO_BaseEnemyStats so_baseStats;
+
     public enum STATE
     {
         PATROLLING,
@@ -10,8 +15,7 @@ public abstract class BaseEnemy : MonoBehaviour
     }
 
     [SerializeField]protected GameObject _target;
-    protected Rigidbody2D _rigidbody;
-
+    [SerializeField] protected Rigidbody2D _rigidbody;
 
     STATE _state;
 
@@ -23,13 +27,17 @@ public abstract class BaseEnemy : MonoBehaviour
     protected float _viewRange;
     protected float _attackRate;
     protected float _nextAttack;
-    protected int _currentHealth;
+    [SerializeField]protected int _currentHealth;
 
     [Header("Patrol Stats")]
     [SerializeField] Transform[] _patrolPosition = new Transform[2];
     protected int _currentPatrolIndex = 0;
     protected float _waitTimer = 0f;
-    protected float _waitDuration = 3f;
+    protected float _waitDuration;
+    [Header("Vulnereable state")]
+    [SerializeField] float _vulnerableTime;
+    [SerializeField] float _vulnerableThreshold;
+    bool _vulnerable;
 
 
     public event Action<BaseEnemy> OnEnemyDied;
@@ -37,18 +45,23 @@ public abstract class BaseEnemy : MonoBehaviour
 
     private void OnEnable()
     {
-        _target = FindAnyObjectByType<PlayerManager>().gameObject;
         _rigidbody = GetComponent<Rigidbody2D>();
-
         SetValue();
-
         _state = STATE.PATROLLING;
-
         FindAnyObjectByType<Player_Combo>().AddEnemyToComboCountList(this);
+        FindAnyObjectByType<CameraFlash>().AddCameraFlashEvent(this);
 
     }
 
-    protected virtual void SetValue(){}
+    protected virtual void SetValue()
+    {
+        _currentSpeed = so_baseStats._baseSpeed;
+        _currentHealth = so_baseStats._baseHealth;
+        _stopDistance = so_baseStats._stopDistance;
+        _viewRange = so_baseStats._viewrange;
+        _attackRate = so_baseStats._attackRate;
+        _waitDuration = so_baseStats._waitDuration;
+    }
     private void Update()
     {
 
@@ -117,7 +130,7 @@ public abstract class BaseEnemy : MonoBehaviour
     public void ChasePlayer()
     {
         if (_target == null)
-            return;
+            _target = PlayerManager.Instance.gameObject;
 
         Vector2 enemyPos = transform.position;
         Vector2 targetPos = _target.transform.position;
@@ -140,19 +153,26 @@ public abstract class BaseEnemy : MonoBehaviour
 
     public virtual void AttackPlayer(){}
 
-    void TakeDamage(int dmg)
+    public void TakeDamage(int dmg)
     {
+        _currentHealth -= dmg;
         if (_currentHealth > 0)
         {
-            _currentHealth -= dmg;
             _state = STATE.ATTACKING;
             OnEnemyHit?.Invoke(this);
+            if(_currentHealth < so_baseStats._baseHealth * _vulnerableThreshold
+                && !_vulnerable)
+            {
+                _vulnerable = true;
+                Invoke("IsNotVulnerable",_vulnerableTime);
+            }
         }
         else
         {
             OnEnemyDied?.Invoke(this);
         }
     }
+    void IsNotVulnerable(){_vulnerable = false;}
 
     public void OnTriggerEnter2D(Collider2D other)
     {
@@ -173,8 +193,15 @@ public abstract class BaseEnemy : MonoBehaviour
             }
 
             AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_EnemyHit, this.transform.position);
-
+        }
+        if (other.GetComponent<Player_HomingCollider>() != null)
+        {
+            TakeDamage(_currentHealth);
+            AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_EnemyHit, this.transform.position);
+            PlayerManager.Instance.StopHoming();
+            PlayerManager.Instance.HomingKnockBack();
         }
     }
 
+    public bool isVulnerable() => _vulnerable;
 }

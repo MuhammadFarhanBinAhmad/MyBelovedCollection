@@ -48,6 +48,13 @@ public class UI_PlayerCombo : MonoBehaviour
     }
     public void ChangeComboNumberLevelText(int combocount)
     {
+
+        if (combocount == 0)
+        {
+            text_LevelCombo.text = "";
+            return;
+        }
+
         text_NumberCombo.text = "x" + combocount.ToString();
         foreach (var level in _Combo.levels)
         {

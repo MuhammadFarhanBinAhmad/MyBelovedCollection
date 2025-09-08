@@ -35,5 +35,28 @@ public class RoomManager : MonoBehaviour
         }
     }
 
+    public GameObject GetNearestEnemyToPlayer()
+    {
+        GameObject _nearestEnemy = null;
+        float _nearestdistance = PlayerManager.Instance._HomingDistance;
+        for (int i = 0; i < _EnemyList.Count; i++)
+        {
+            float distance = Vector2.Distance(PlayerManager.Instance.transform.position, _EnemyList[i].gameObject.transform.position);
+
+            if (distance < _nearestdistance)
+            {
+                if(_EnemyList[i].gameObject.GetComponent<BaseEnemy>().isVulnerable())
+                {
+                    _nearestEnemy = _EnemyList[i].gameObject;
+                    _nearestdistance = distance;
+                }
+            }
+        }
+        return _nearestEnemy;
+    }
+    public void SetRoomManager() 
+    {
+        PlayerManager.Instance._roomManager = this;
+    }
 
 }

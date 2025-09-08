@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "MeleeEnemyStats", menuName = "Scriptable Objects/MeleeEnemy")]
-public class SO_MeleeEnemy : ScriptableObject
+public class SO_BaseEnemyStats : ScriptableObject
 {
     public float _baseSpeed;
     public int _baseHealth;

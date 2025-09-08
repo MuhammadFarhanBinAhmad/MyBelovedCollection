@@ -4,7 +4,6 @@ public class Player_Weapon : WeaponBase
 {
 
 
-    PlayerManager _PlayerManager;
 
     [SerializeField] float cam_shakeValue;
 
@@ -20,7 +19,6 @@ public class Player_Weapon : WeaponBase
     {
         base.Start();
         _UIManager.UpdatePlayerUIObserver();
-        _PlayerManager = FindAnyObjectByType<PlayerManager>();
     }
 
     void Update()
@@ -37,7 +35,7 @@ public class Player_Weapon : WeaponBase
             _nextTimeToFire <= 0 && 
             !weapon_IsReloading &&
             magazine_LeftAmount > 0 &&
-            !_PlayerManager.GetIsDashing())
+            !PlayerManager.Instance.GetIsDashing())
         {
             SpawnProjectile();
             magazine_LeftAmount--;

@@ -391,6 +391,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d286af30298a464b985e1ed6d15ac40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  so_baseStats: {fileID: 11400000, guid: 5b6062919ca10a847a3e9e296ae16323, type: 2}
   _target: {fileID: 0}
   _detectionMask:
     serializedVersion: 2
@@ -398,6 +399,8 @@ MonoBehaviour:
   _patrolPosition:
   - {fileID: 2876624140315076688}
   - {fileID: 433857366894997441}
-  _rangeEnemy: {fileID: 11400000, guid: e8dd2fce7017c9443b5891498a339e6f, type: 2}
+  _vulnerableTime: 3
+  _vulnerableThreshold: 0.4
+  so_projectileStats: {fileID: 11400000, guid: e8dd2fce7017c9443b5891498a339e6f, type: 2}
   proj_SpawnPos: {fileID: 6321674383357391389}
   _weapon: {fileID: 3553616341231326493}

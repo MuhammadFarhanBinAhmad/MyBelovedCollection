@@ -2,8 +2,7 @@ using UnityEngine;
 
 public class RangeEnemy : BaseEnemy
 {
-
-    [SerializeField]SO_RangeEnemy _rangeEnemy;
+    [SerializeField] SO_ProjectileStats so_projectileStats;
 
     ProjectilePool _pool;
     [SerializeField] Transform proj_SpawnPos;
@@ -13,16 +12,6 @@ public class RangeEnemy : BaseEnemy
     private void Start()
     {
         _pool = FindAnyObjectByType<ProjectilePool>();
-    }
-
-    protected override void SetValue()
-    {
-        _currentSpeed = _rangeEnemy._baseSpeed;
-        _currentHealth = _rangeEnemy._baseHealth;
-        _stopDistance = _rangeEnemy._stopDistance;
-        _viewRange = _rangeEnemy._viewrange;
-        _attackRate = _rangeEnemy._attackRate;
-        _waitDuration = _rangeEnemy._waitDuration;
     }
 
     public override void AttackPlayer()
@@ -39,8 +28,8 @@ public class RangeEnemy : BaseEnemy
             _proj.SetOwner(BULLETOWNER.ENEMY);
             _proj.SetDirection(direction);
             _proj.SetPosition(proj_SpawnPos.position);
-            _proj.SetDamage(_rangeEnemy._damage);
-            _proj.SetSpeed(_rangeEnemy._speed);
+            _proj.SetDamage(so_projectileStats._damage);
+            _proj.SetSpeed(so_projectileStats._speed);
 
             _nextAttack = Time.time + _attackRate; // schedule next attack }
         }

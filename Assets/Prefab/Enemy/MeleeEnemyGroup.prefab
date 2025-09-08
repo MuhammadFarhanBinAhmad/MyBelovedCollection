@@ -271,6 +271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 414aca0f42e3322429fb44eb393ef32d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  so_baseStats: {fileID: 11400000, guid: e3e3cb1dab756b042ad51759aae7222b, type: 2}
   _target: {fileID: 0}
   _detectionMask:
     serializedVersion: 2
@@ -278,4 +279,5 @@ MonoBehaviour:
   _patrolPosition:
   - {fileID: 3728422427902398236}
   - {fileID: 9100370538840121904}
-  _MeleeEnemy: {fileID: 11400000, guid: e3e3cb1dab756b042ad51759aae7222b, type: 2}
+  _vulnerableTime: 5
+  _vulnerableThreshold: 0.3

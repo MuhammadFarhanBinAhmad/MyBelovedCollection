@@ -65,7 +65,7 @@ public class UI_PlayerWeapon : MonoBehaviour , I_UIObserver
             GameObject go = Instantiate(_BulletImage, spawnpos, _BulletImageTransform.rotation);
             _AmmoImage[i] = go;
             go.transform.parent = this.transform;
-
+            go.transform.localScale = Vector3.one;
         }
     }
 
