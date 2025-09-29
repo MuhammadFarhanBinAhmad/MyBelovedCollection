@@ -2,16 +2,10 @@ using UnityEngine;
 
 public class Player_Weapon : WeaponBase
 {
-
-
-
     [SerializeField] float cam_shakeValue;
 
     private void OnEnable()
     {
-        magazine_BaseAmount = so_WeaponType.magazine_BaseAmount;
-        ammoreserve_BaseAmount = so_WeaponType.ammoreserve_BaseAmount;
-        weapon_BaseReloadTime = so_WeaponType .weapon_BaseReloadTime;
         _fireRate = so_WeaponType.weapon_fireRate;
     }
 
@@ -25,7 +19,6 @@ public class Player_Weapon : WeaponBase
     {
         AimAtMouse();
         ShootWeapon();
-        ReloadWeapon();
     }
 
     public override void ShootWeapon() 
@@ -33,14 +26,11 @@ public class Player_Weapon : WeaponBase
 
         if (Input.GetMouseButtonDown(0) && 
             _nextTimeToFire <= 0 && 
-            !weapon_IsReloading &&
-            magazine_LeftAmount > 0 &&
             !PlayerManager.Instance.GetIsDashing())
         {
             SpawnProjectile();
-            magazine_LeftAmount--;
             _nextTimeToFire = _fireRate;
-            _UIManager.UpdatePlayerUIObserver();
+
         }
         else
         {

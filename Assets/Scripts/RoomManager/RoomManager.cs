@@ -1,13 +1,14 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class RoomManager : MonoBehaviour
 {
     public List<BaseEnemy> _EnemyList = new List<BaseEnemy> ();
     [SerializeField]internal CameraShake _camShake;
-    bool _isRoomCleared;
 
-    [SerializeField]GameObject _roomDoor;
+    [SerializeField] Transform _respawnPoint;
 
     public void AddEnemyToList(BaseEnemy _enemy)
     {
@@ -24,15 +25,6 @@ public class RoomManager : MonoBehaviour
         
         _enemy.gameObject.SetActive (false);
         _EnemyList.Remove(_enemy);
-
-        if (_isRoomCleared)
-            { return; }
-
-        if(_EnemyList.Count <= 0)
-        {
-            _isRoomCleared = true;
-            _roomDoor.SetActive(false);
-        }
     }
 
     public GameObject GetNearestEnemyToPlayer()
@@ -57,6 +49,16 @@ public class RoomManager : MonoBehaviour
     public void SetRoomManager() 
     {
         PlayerManager.Instance._roomManager = this;
+        PlayerManager.Instance.SetRespawnZone(_respawnPoint);
+    }
+
+    public void RespawnPlayer() => StartCoroutine(RespawnPlayerCoroutine());
+
+    IEnumerator RespawnPlayerCoroutine()
+    {
+        yield return new WaitForSeconds(1);
+        PlayerManager.Instance.ResetStats();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
 }

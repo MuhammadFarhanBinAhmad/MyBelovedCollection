@@ -3,21 +3,20 @@ using UnityEngine;
 
 public class RoomCamera : MonoBehaviour
 {
-    [SerializeField]
-    GameObject _virtualcamera;
-    CameraShake _CameraShake;
-    CinemachineCamera _cineMachineCamera;
+
+    [SerializeField]  GameObject _virtualcamera;
+    [SerializeField] CameraShake _CameraShake;
+    [SerializeField] CinemachineCamera _cineMachineCamera;
 
     private void OnEnable()
     {
         _CameraShake = FindAnyObjectByType<CameraShake>();
-        if(_CameraShake == null )
         _cineMachineCamera = _virtualcamera.GetComponent<CinemachineCamera>();
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if(other.CompareTag("Player") && !other.isTrigger)
+        if(other.GetComponent<PlayerManager>() != null)
         {
             _virtualcamera.SetActive(true);
             _cineMachineCamera.Follow = other.transform;
@@ -28,7 +27,7 @@ public class RoomCamera : MonoBehaviour
     }
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player") && !other.isTrigger)
+        if (other.CompareTag("Player") && !other.GetComponent<PlayerManager>().GetIsDead())
         {
             _virtualcamera.SetActive(false);
         }

@@ -150,6 +150,7 @@ MonoBehaviour:
   _traumaValue: 1
   trauma_enemyOnHit: 0.25
   trauma_enemyOnDeath: 0.5
+  trauma_playerOnDeath: 0.5
 --- !u!114 &1121337826437400986
 MonoBehaviour:
   m_ObjectHideFlags: 0

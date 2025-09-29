@@ -1,6 +1,5 @@
 using Unity.Cinemachine;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
 
 public class CameraShake : MonoBehaviour
 {
@@ -30,7 +29,7 @@ public class CameraShake : MonoBehaviour
     private Quaternion originalLocalRot;
 
     [Header("TraumaValueForEnemy")]
-    [SerializeField] float trauma_enemyOnHit,trauma_enemyOnDeath;
+    [SerializeField] float trauma_enemyOnHit,trauma_enemyOnDeath,trauma_playerOnDeath;
 
     private void Awake()
     {
@@ -55,18 +54,27 @@ public class CameraShake : MonoBehaviour
         enemy.OnEnemyDied -= (e) => SetTrauma(e, trauma_enemyOnDeath);
     }
     private void SetTrauma(BaseEnemy enemy, float value) => trauma = Mathf.Clamp01(value);
-
-    public void OnEnemyHit()
+    private void SetTrauma(PlayerManager enemy, float value)
     {
-
+        trauma = Mathf.Clamp01(value);
+        print(trauma + " hit");
     }
 
+    public void AddCamShakeOnDeathEvent()
+    {
+        PlayerManager.Instance.OnPlayerDied += (p) => SetTrauma(p, trauma_playerOnDeath);
+    }
+    private void Start()
+    {
+        AddCamShakeOnDeathEvent();
+    }
     private void Update()
     {
-        if (cineCamera == null || noise == null) return;
+        //if (cineCamera == null || noise == null) return;
 
         if (trauma > 0f)
         {
+            print("yetr");
             float shake = Mathf.Pow(trauma, traumaPower);
             float time = Time.time * frequency;
 

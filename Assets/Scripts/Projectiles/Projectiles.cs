@@ -35,6 +35,8 @@ public class Projectiles : MonoBehaviour
     private void OnEnable()
     {
         time_currentTillDisable = time_tillDisable;
+        // Add inaccuracy (spread) for 2D bullets
+
     }
     public void SetDamage(int dmg) { _dmg = dmg; }
     public int GetDamage() { return _dmg; }
@@ -42,8 +44,19 @@ public class Projectiles : MonoBehaviour
     public void SetSpeed(int speed) { _speed = speed; }
     public int GetSpeed() { return _speed; }
 
-    public void SetDirection(Vector2 dir) { _direction = dir; }
-    public void SetPosition(Vector2 pos) { transform.position = pos; }
+    public void SetDirection(Vector2 dir) 
+    {
+        _direction = dir;
+        float spreadAngle = UnityEngine.Random.Range(-2f, 2f); // tweak range for accuracy
+        float rad = spreadAngle * Mathf.Deg2Rad;
+
+        // Rotate the direction vector by spread angle in 2D
+        _direction = new Vector2(
+            _direction.x * Mathf.Cos(rad) - _direction.y * Mathf.Sin(rad),
+            _direction.x * Mathf.Sin(rad) + _direction.y * Mathf.Cos(rad)
+        );
+    }
+    public void SetPosition(Vector3 pos) { transform.position = pos; }
 
     public void SetOwner(BULLETOWNER owner) { _BulletOwner = owner; }
 
@@ -67,6 +80,33 @@ public class Projectiles : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        switch (_BulletOwner)
+        {
+            case BULLETOWNER.ENEMY:
+                {
+                    if (other.GetComponent<PlayerManager>() != null)
+                    {
+                        PlayerManager _player = other.GetComponent<PlayerManager>();
+                        _player.TakeDamage();
+                        SelfDestruct();
+                    }
+                    break;
+                }
+            case BULLETOWNER.PLAYER:
+                {
+                    if (other.GetComponent<BaseEnemy>() != null)
+                    {
+                        BaseEnemy _be = other.GetComponent<BaseEnemy>();
+                        _be.TakeDamage(_dmg);
+                        SelfDestruct();
+
+                        AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_EnemyHit, this.transform.position);
+                    }
+                    break;
+                }
+        }
+
+
         if (other.tag == "Ground")
         {
             SelfDestruct();

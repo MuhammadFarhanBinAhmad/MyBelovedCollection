@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="EncodableAsset" id="{4098b8a8-2c4d-4d34-b2c5-b1fcdb8856fa}">
+		<property name="assetPath">
+			<value>SFX/Traps/</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{e7b67b89-4e8a-4777-8f03-ab068ee75027}</destination>
+		</relationship>
+	</object>
+</objects>

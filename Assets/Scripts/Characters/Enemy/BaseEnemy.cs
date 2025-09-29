@@ -19,7 +19,6 @@ public abstract class BaseEnemy : MonoBehaviour
 
     STATE _state;
 
-
     [SerializeField] LayerMask _detectionMask;
     [Header("Combat Stats")]
     protected float _currentSpeed;
@@ -38,6 +37,8 @@ public abstract class BaseEnemy : MonoBehaviour
     [SerializeField] float _vulnerableTime;
     [SerializeField] float _vulnerableThreshold;
     bool _vulnerable;
+
+    [SerializeField] bool _chase_AfterDetectingOrDamaged = true;
 
 
     public event Action<BaseEnemy> OnEnemyDied;
@@ -124,8 +125,13 @@ public abstract class BaseEnemy : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(transform.position, facingDir, _viewRange, _detectionMask);
 
         Debug.DrawRay(transform.position, facingDir * _viewRange, Color.red); // Debug line in Scene view
-        if (hit)
-            _state = STATE.ATTACKING;
+
+        if(_chase_AfterDetectingOrDamaged)
+        {
+            if (hit)
+                _state = STATE.ATTACKING;
+        }
+
     }
     public void ChasePlayer()
     {
@@ -182,17 +188,6 @@ public abstract class BaseEnemy : MonoBehaviour
             RoomManager _roomManager = other.GetComponent<RoomManager>();
             _roomManager.AddEnemyToList(this);
 
-        }
-        if (other.GetComponent<Projectiles>() != null)
-        {
-            Projectiles temp_Proj = other.GetComponent<Projectiles>();
-            if(temp_Proj._BulletOwner == BULLETOWNER.PLAYER)
-            {
-                TakeDamage(temp_Proj.GetDamage());
-                temp_Proj.SelfDestruct();
-            }
-
-            AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_EnemyHit, this.transform.position);
         }
         if (other.GetComponent<Player_HomingCollider>() != null)
         {

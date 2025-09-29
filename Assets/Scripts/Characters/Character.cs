@@ -18,14 +18,6 @@ public class Character : MonoBehaviour
         _Health = _BaseHealth;
         _Speed = _BaseSpeed;
     }
-    public void TakeDamage(int dmg)
-    {
-        _Health -= dmg;
 
-        if(_Health < 0 )
-        {
-            gameObject.SetActive(false);
-        }
-    }
 
 }

@@ -3,18 +3,23 @@ using FMODUnity;
 
 public class FmodEvent : MonoBehaviour
 {
-    [Header("Environment")]
-    [field: Header("Coin sfx")]
+    [field: Header("Environment")]
     [field: SerializeField] public EventReference sfx_GunShot { get; private set; }
 
-    [Header("Player")]
-    [field: Header("Player Footstep sfx")]
-    [field: SerializeField] public EventReference sfx_PlayerFootStep { get; private set; }    
-    [field: Header("Player Dashing sfx")]
-    [field: SerializeField] public EventReference sfx_PlayerDashing { get; private set; }
 
-    [Header("Enemy")]
-    [field: Header("Enemy Hit sfx")]
+    [field: Header("Traps")]
+    [field: SerializeField] public EventReference sfx_TrapDoor { get; private set; }
+    [field: SerializeField] public EventReference sfx_PopUpSpikeTrap { get; private set; }
+
+
+    [field: Header("Player")]
+    [field: SerializeField] public EventReference sfx_PlayerFootStep { get; private set; }
+    [field: SerializeField] public EventReference sfx_PlayerDashing { get; private set; }
+    [field: SerializeField] public EventReference sfx_PlayerDeath { get; private set; }
+    [field: SerializeField] public EventReference sfx_PlayerJump { get; private set; }
+
+
+    [field: Header("Enemy")]
     [field: SerializeField] public EventReference sfx_EnemyHit { get; private set; }
 
 

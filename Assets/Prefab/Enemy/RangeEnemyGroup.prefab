@@ -296,7 +296,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.18378538, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -393,9 +393,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   so_baseStats: {fileID: 11400000, guid: 5b6062919ca10a847a3e9e296ae16323, type: 2}
   _target: {fileID: 0}
+  _rigidbody: {fileID: 0}
   _detectionMask:
     serializedVersion: 2
     m_Bits: 64
+  _currentHealth: 0
   _patrolPosition:
   - {fileID: 2876624140315076688}
   - {fileID: 433857366894997441}

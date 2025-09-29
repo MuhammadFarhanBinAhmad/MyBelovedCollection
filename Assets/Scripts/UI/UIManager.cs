@@ -1,12 +1,11 @@
+using System.Collections;
 using UnityEngine;
 
 public class UIManager : UISubject
 {
 
-    public void RegisterEnemy(BaseEnemy enemy)
-    {
-        enemy.OnEnemyDied += UpdateEnemyCount;
-    }
+    [Header("RestartBlackScreen")]
+    [SerializeField] GameObject blackScreen;
 
     public void UpdateEnemyCount(BaseEnemy enemy)
     {

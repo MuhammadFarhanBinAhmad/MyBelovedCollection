@@ -15,8 +15,4 @@ public class Player_Combo : MonoBehaviour
         combo_Count++;
         UI_PlayerCombo.Instance.ChangeComboNumberLevelText(combo_Count);
     }
-    public void ResetComboCount()
-    {
-        
-    }
 }
