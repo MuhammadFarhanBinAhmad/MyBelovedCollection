@@ -1,9 +1,10 @@
 using System;
+using System.Collections;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public abstract class BaseEnemy : MonoBehaviour
+public abstract class BaseEnemy : MonoBehaviour , IResettable
 {
 
     [SerializeField]internal SO_BaseEnemyStats so_baseStats;
@@ -14,10 +15,11 @@ public abstract class BaseEnemy : MonoBehaviour
         ATTACKING
     }
 
-    [SerializeField]protected GameObject _target;
-    [SerializeField] protected Rigidbody2D _rigidbody;
+    protected GameObject _target;
+    protected Rigidbody2D _rigidbody;
+    protected SpriteRenderer _spriteRenderer;
 
-    STATE _state;
+    internal STATE _state;
 
     [SerializeField] LayerMask _detectionMask;
     [Header("Combat Stats")]
@@ -27,6 +29,7 @@ public abstract class BaseEnemy : MonoBehaviour
     protected float _attackRate;
     protected float _nextAttack;
     [SerializeField]protected int _currentHealth;
+    internal bool _hasInvulnerableShield;
 
     [Header("Patrol Stats")]
     [SerializeField] Transform[] _patrolPosition = new Transform[2];
@@ -36,7 +39,13 @@ public abstract class BaseEnemy : MonoBehaviour
     [Header("Vulnereable state")]
     [SerializeField] float _vulnerableTime;
     [SerializeField] float _vulnerableThreshold;
+    [SerializeField] float _stunDuration;
     bool _vulnerable;
+
+    [Header("HitColour")]
+    Color _originalColor;
+    [SerializeField] Color _stunColor;
+
 
     [SerializeField] bool _chase_AfterDetectingOrDamaged = true;
 
@@ -44,16 +53,39 @@ public abstract class BaseEnemy : MonoBehaviour
     public event Action<BaseEnemy> OnEnemyDied;
     public event Action<BaseEnemy> OnEnemyHit;
 
+    // --- Store initial state for reset ---
+    private Vector3 _startPos;
+    private Quaternion _startRot;
+    private Vector3 _startScale;
+
     private void OnEnable()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _originalColor = _spriteRenderer.color;
         SetValue();
         _state = STATE.PATROLLING;
+
+
+        // Save initial state
+        _startPos = transform.position;
+        _startRot = transform.rotation;
+        _startScale = transform.localScale;
+
         FindAnyObjectByType<Player_Combo>().AddEnemyToComboCountList(this);
         FindAnyObjectByType<CameraFlash>().AddCameraFlashEvent(this);
 
-    }
+        RoomManager room = GetComponentInParent<RoomManager>();
+        if (room != null)
+            room.RegisterResettable(this);
 
+    }
+    private void OnDisable()
+    {
+        RoomManager room = GetComponentInParent<RoomManager>();
+        if (room != null)
+            room.UnregisterResettable(this);
+    }
     protected virtual void SetValue()
     {
         _currentSpeed = so_baseStats._baseSpeed;
@@ -62,6 +94,8 @@ public abstract class BaseEnemy : MonoBehaviour
         _viewRange = so_baseStats._viewrange;
         _attackRate = so_baseStats._attackRate;
         _waitDuration = so_baseStats._waitDuration;
+        _hasInvulnerableShield = so_baseStats._hasInvulnerableShield;
+
     }
     private void Update()
     {
@@ -118,7 +152,7 @@ public abstract class BaseEnemy : MonoBehaviour
             _rigidbody.linearVelocity = new Vector2(direction.x * _currentSpeed, _rigidbody.linearVelocity.y);
         }
     }
-    void DetectPlayer()
+    public virtual void DetectPlayer()
     {
         Vector2 facingDir = transform.localScale.x > 0 ? Vector2.right : Vector2.left;
 
@@ -133,7 +167,7 @@ public abstract class BaseEnemy : MonoBehaviour
         }
 
     }
-    public void ChasePlayer()
+    public virtual void  ChasePlayer()
     {
         if (_target == null)
             _target = PlayerManager.Instance.gameObject;
@@ -142,7 +176,6 @@ public abstract class BaseEnemy : MonoBehaviour
         Vector2 targetPos = _target.transform.position;
 
         float distance = Vector3.Distance(transform.position, _target.transform.position);
-
         if (Mathf.Abs(distance) >= _stopDistance)
         {
             Vector2 direction = (targetPos - enemyPos).normalized;
@@ -159,18 +192,26 @@ public abstract class BaseEnemy : MonoBehaviour
 
     public virtual void AttackPlayer(){}
 
-    public void TakeDamage(int dmg)
+    public virtual void TakeDamage(int dmg)
     {
         _currentHealth -= dmg;
         if (_currentHealth > 0)
         {
+            // Stop all movement during stun
+            _rigidbody.linearVelocity = Vector2.zero;
+
+            // Trigger stunned state
+            StartCoroutine(TempStun());
+
+            // If enemy can chase after being hit
             _state = STATE.ATTACKING;
             OnEnemyHit?.Invoke(this);
-            if(_currentHealth < so_baseStats._baseHealth * _vulnerableThreshold
-                && !_vulnerable)
+
+            // Vulnerable check
+            if (_currentHealth < so_baseStats._baseHealth * _vulnerableThreshold && !_vulnerable)
             {
                 _vulnerable = true;
-                Invoke("IsNotVulnerable",_vulnerableTime);
+                Invoke(nameof(IsNotVulnerable), _vulnerableTime);
             }
         }
         else
@@ -178,6 +219,20 @@ public abstract class BaseEnemy : MonoBehaviour
             OnEnemyDied?.Invoke(this);
         }
     }
+    IEnumerator TempStun()
+    {
+        float originalSpeed = _currentSpeed;
+        _currentSpeed = 0f; // temporarily stop movement
+        _spriteRenderer.color = _stunColor;
+        yield return new WaitForSeconds(_stunDuration);
+        _spriteRenderer.color = _originalColor;
+        yield return new WaitForSeconds(_stunDuration);
+        _spriteRenderer.color = _stunColor;        
+        yield return new WaitForSeconds(_stunDuration * 2);
+        _spriteRenderer.color = _originalColor;
+        _currentSpeed = originalSpeed; // restore movement
+    }
+
     void IsNotVulnerable(){_vulnerable = false;}
 
     public void OnTriggerEnter2D(Collider2D other)
@@ -185,18 +240,49 @@ public abstract class BaseEnemy : MonoBehaviour
 
         if (other.GetComponent<RoomManager>() != null)
         {
+            print("hit");
             RoomManager _roomManager = other.GetComponent<RoomManager>();
             _roomManager.AddEnemyToList(this);
 
         }
-        if (other.GetComponent<Player_HomingCollider>() != null)
+        Player_HomingCollider player_hc = other.GetComponent<Player_HomingCollider>();
+        if (player_hc != null)
         {
             TakeDamage(_currentHealth);
             AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_EnemyHit, this.transform.position);
             PlayerManager.Instance.StopHoming();
             PlayerManager.Instance.HomingKnockBack();
         }
+        PlayerManager player = other.GetComponent<PlayerManager>();
+        if (player != null)
+        {
+            player.TakeDamage();
+        }
     }
 
     public bool isVulnerable() => _vulnerable;
+
+    public void ResetObject()
+    {
+        CancelInvoke();
+        _rigidbody.linearVelocity = Vector2.zero;
+
+        // Reset transform
+        transform.position = _startPos;
+        transform.rotation = _startRot;
+        transform.localScale = _startScale;
+
+        // Reset stats
+        _vulnerable = false;
+
+        // Reset AI state
+        _currentPatrolIndex = 0;
+        _waitTimer = 0f;
+        _state = STATE.PATROLLING;
+        _target = null;
+
+        SetValue();
+
+        gameObject.SetActive(true); // ensure enemy is active again
+    }
 }

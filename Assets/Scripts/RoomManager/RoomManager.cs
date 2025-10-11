@@ -6,9 +6,22 @@ using UnityEngine.SceneManagement;
 public class RoomManager : MonoBehaviour
 {
     public List<BaseEnemy> _EnemyList = new List<BaseEnemy> ();
+    public List<IResettable> _resettables = new List<IResettable>();
     [SerializeField]internal CameraShake _camShake;
 
     [SerializeField] Transform _respawnPoint;
+
+    public void RegisterResettable(IResettable resettable)
+    {
+        if (!_resettables.Contains(resettable))
+            _resettables.Add(resettable);
+    }
+
+    public void UnregisterResettable(IResettable resettable)
+    {
+        if (_resettables.Contains(resettable))
+            _resettables.Remove(resettable);
+    }
 
     public void AddEnemyToList(BaseEnemy _enemy)
     {
@@ -24,7 +37,6 @@ public class RoomManager : MonoBehaviour
             return;
         
         _enemy.gameObject.SetActive (false);
-        _EnemyList.Remove(_enemy);
     }
 
     public GameObject GetNearestEnemyToPlayer()
@@ -50,15 +62,26 @@ public class RoomManager : MonoBehaviour
     {
         PlayerManager.Instance._roomManager = this;
         PlayerManager.Instance.SetRespawnZone(_respawnPoint);
+        if (FindAnyObjectByType<Player_Weapon>() != null)
+        {
+            FindAnyObjectByType<Player_Weapon>().SetCameraShake(_camShake);
+        }
+
     }
 
     public void RespawnPlayer() => StartCoroutine(RespawnPlayerCoroutine());
 
     IEnumerator RespawnPlayerCoroutine()
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(1f);
+        ResetRoom();
         PlayerManager.Instance.ResetStats();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
-
+    public void ResetRoom()
+    {
+        foreach(var enemy in _EnemyList) 
+            enemy.gameObject.SetActive(true);
+        foreach (var resettable in _resettables)
+            resettable.ResetObject();
+    }
 }

@@ -5,12 +5,10 @@ public class RoomCamera : MonoBehaviour
 {
 
     [SerializeField]  GameObject _virtualcamera;
-    [SerializeField] CameraShake _CameraShake;
     [SerializeField] CinemachineCamera _cineMachineCamera;
 
     private void OnEnable()
     {
-        _CameraShake = FindAnyObjectByType<CameraShake>();
         _cineMachineCamera = _virtualcamera.GetComponent<CinemachineCamera>();
     }
 

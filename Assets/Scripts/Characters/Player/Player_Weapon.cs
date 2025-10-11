@@ -1,12 +1,21 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Rendering.Universal;
 
 public class Player_Weapon : WeaponBase
 {
     [SerializeField] float cam_shakeValue;
 
+    [Header("MuzzleFlash")]
+    [SerializeField] Light2D _muzzleFlash;
+    [SerializeField] float min_muzzleFlashIntensity, max_muzzleFlashIntensity;
+
+    CameraShake _CameraShake;
     private void OnEnable()
     {
         _fireRate = so_WeaponType.weapon_fireRate;
+        _CameraShake = PlayerManager.Instance._roomManager._camShake;
     }
 
     public override void Start() 
@@ -20,7 +29,7 @@ public class Player_Weapon : WeaponBase
         AimAtMouse();
         ShootWeapon();
     }
-
+    public void SetCameraShake(CameraShake _cm) { _CameraShake = _cm; }
     public override void ShootWeapon() 
     {
 
@@ -51,9 +60,18 @@ public class Player_Weapon : WeaponBase
         proj.SetPosition(_SpawnPosition.position);
         proj.SetDamage(so_WeaponType.ammo_damage);
         proj.SetSpeed(so_WeaponType.ammo_speed);
-
+        _muzzleFlash.intensity = Random.Range(min_muzzleFlashIntensity, max_muzzleFlashIntensity);
+        StartCoroutine(ResetMuzzleFlashIntensity());
+        _CameraShake.SetTrauma(this,.2f);
         AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_GunShot, this.transform.position);
     }
+
+    IEnumerator ResetMuzzleFlashIntensity()
+    {
+        yield return new WaitForSeconds(.1f);
+        _muzzleFlash.intensity = 0;
+    }
+
     void AimAtMouse()
     {
         // Get mouse position in world space

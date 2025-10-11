@@ -9,4 +9,6 @@ public class SO_BaseEnemyStats : ScriptableObject
     public float _stopDistance;
     public float _viewrange;
     public float _waitDuration;
+    public bool _chasePlayer;
+    public bool _hasInvulnerableShield;
 }

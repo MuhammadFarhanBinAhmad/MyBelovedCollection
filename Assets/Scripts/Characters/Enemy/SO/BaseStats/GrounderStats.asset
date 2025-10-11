@@ -9,14 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3351d8e597d86324c96c47c00d3e3836, type: 3}
-  m_Name: RangeEnemyStats_01
+  m_Script: {fileID: 11500000, guid: 7e6ff60ff6607014e96c327a521adc6f, type: 3}
+  m_Name: GrounderStats
   m_EditorClassIdentifier: 
   _baseSpeed: 5
-  _baseHealth: 100
+  _baseHealth: 5
   _attackRate: 2
-  _stopDistance: 5
-  _viewrange: 10
-  _waitDuration: 3
-  _damage: 15
-  _speed: 15
+  _stopDistance: 3
+  _viewrange: 0
+  _waitDuration: 0.1
+  _chasePlayer: 0

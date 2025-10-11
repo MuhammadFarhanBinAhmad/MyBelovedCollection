@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{0825627f-53f2-414e-aa66-4016b8438712}">
+		<property name="assetPath">
+			<value>Enemy/Gameplay/ProjectileDeflect.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>1</value>
+		</property>
+		<property name="length">
+			<value>0.32843537414965984</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{e7b67b89-4e8a-4777-8f03-ab068ee75027}</destination>
+		</relationship>
+	</object>
+</objects>

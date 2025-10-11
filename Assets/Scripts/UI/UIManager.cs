@@ -14,6 +14,18 @@ public class UIManager : UISubject
 
     }
 
+    public void DeathFlashScreem()
+    {
+        blackScreen.SetActive(true);
+        StartCoroutine(DisableDeathFlash());
+    }
+
+    IEnumerator DisableDeathFlash()
+    {
+        yield return new WaitForSeconds(.5f);
+        blackScreen.SetActive(false);
+    }
+
 
 
 }

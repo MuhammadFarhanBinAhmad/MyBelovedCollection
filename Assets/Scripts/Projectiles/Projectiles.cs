@@ -6,7 +6,10 @@ using FMODUnity;
 public enum BULLETOWNER
 {
     PLAYER,
-    ENEMY
+    OBSTACLE,
+    GREENBAY,
+    WIZARD,
+    HARD_CORE_HENRY
 }
 
 public class Projectiles : MonoBehaviour
@@ -23,7 +26,7 @@ public class Projectiles : MonoBehaviour
     [SerializeField] float time_tillDisable;
     float time_currentTillDisable;
 
-    internal BULLETOWNER _BulletOwner;
+    [SerializeField]internal BULLETOWNER _BulletOwner;
     int _dmg, _speed;
 
 
@@ -82,7 +85,17 @@ public class Projectiles : MonoBehaviour
     {
         switch (_BulletOwner)
         {
-            case BULLETOWNER.ENEMY:
+            case BULLETOWNER.GREENBAY:
+                {
+                    if (other.GetComponent<PlayerManager>() != null)
+                    {
+                        PlayerManager _player = other.GetComponent<PlayerManager>();
+                        _player.TakeDamage();
+                        SelfDestruct();
+                    }
+                    break;
+                }
+            case BULLETOWNER.OBSTACLE:
                 {
                     if (other.GetComponent<PlayerManager>() != null)
                     {
@@ -97,10 +110,23 @@ public class Projectiles : MonoBehaviour
                     if (other.GetComponent<BaseEnemy>() != null)
                     {
                         BaseEnemy _be = other.GetComponent<BaseEnemy>();
-                        _be.TakeDamage(_dmg);
-                        SelfDestruct();
+                        if(_be._hasInvulnerableShield)
+                        {
+                            SelfDestruct();
+                            AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_EnemyDeflectHit, this.transform.position);
+                        }
+                        else
+                        {
+                            _be.TakeDamage(_dmg);
+                            SelfDestruct();
+                            AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_EnemyHit, this.transform.position);
+                        }
 
-                        AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_EnemyHit, this.transform.position);
+                    }
+                    if(other.GetComponent<DestructableWalls>() != null)
+                    {
+                        other.GetComponent<DestructableWalls>().DestroyWall();
+                        SelfDestruct();
                     }
                     break;
                 }

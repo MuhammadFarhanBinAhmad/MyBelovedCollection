@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7e6ff60ff6607014e96c327a521adc6f, type: 3}
-  m_Name: RangeEnemyStats
+  m_Name: ImpStats
   m_EditorClassIdentifier: 
   _baseSpeed: 5
   _baseHealth: 15
-  _attackRate: 2
-  _stopDistance: 5
-  _viewrange: 15
-  _waitDuration: 2
+  _attackRate: 0
+  _stopDistance: 0.1
+  _viewrange: 10
+  _waitDuration: 1

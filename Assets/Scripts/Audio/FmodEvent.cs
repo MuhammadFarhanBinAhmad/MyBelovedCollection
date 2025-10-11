@@ -5,6 +5,7 @@ public class FmodEvent : MonoBehaviour
 {
     [field: Header("Environment")]
     [field: SerializeField] public EventReference sfx_GunShot { get; private set; }
+    [field: SerializeField] public EventReference sfx_DeflectProjectile { get; private set; }
 
 
     [field: Header("Traps")]
@@ -21,6 +22,7 @@ public class FmodEvent : MonoBehaviour
 
     [field: Header("Enemy")]
     [field: SerializeField] public EventReference sfx_EnemyHit { get; private set; }
+    [field: SerializeField] public EventReference sfx_EnemyDeflectHit { get; private set; }
 
 
     public static FmodEvent Instance {  get; private set; }

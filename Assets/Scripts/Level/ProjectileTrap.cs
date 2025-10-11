@@ -36,7 +36,7 @@ public class ProjectileTrap : MonoBehaviour
             Projectiles _proj = GO_proj.GetComponent<Projectiles>();
 
 
-            _proj.SetOwner(BULLETOWNER.ENEMY);
+            _proj.SetOwner(BULLETOWNER.OBSTACLE);
             _proj.SetDirection(transform.right);
             _proj.SetPosition(proj_SpawnPos.position);
             _proj.SetDamage(so_projectileStats._damage);

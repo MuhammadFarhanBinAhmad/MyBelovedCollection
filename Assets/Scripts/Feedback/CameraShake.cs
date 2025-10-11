@@ -28,8 +28,8 @@ public class CameraShake : MonoBehaviour
     private Vector3 originalLocalPos;
     private Quaternion originalLocalRot;
 
-    [Header("TraumaValueForEnemy")]
-    [SerializeField] float trauma_enemyOnHit,trauma_enemyOnDeath,trauma_playerOnDeath;
+    [Header("TraumaValueForEvent")]
+    [SerializeField] float trauma_enemyOnHit,trauma_enemyOnDeath,trauma_playerOnDeath, trauma_playerOnShooting;
 
     private void Awake()
     {
@@ -53,17 +53,28 @@ public class CameraShake : MonoBehaviour
     {
         enemy.OnEnemyDied -= (e) => SetTrauma(e, trauma_enemyOnDeath);
     }
-    private void SetTrauma(BaseEnemy enemy, float value) => trauma = Mathf.Clamp01(value);
-    private void SetTrauma(PlayerManager enemy, float value)
+    public void AddCamShakeOnDestructableProjectileEvent(DestructableProjectiles dp)
     {
-        trauma = Mathf.Clamp01(value);
-        print(trauma + " hit");
+        dp.OnProjectileHit += (p) => SetTrauma(dp, trauma_enemyOnDeath);
     }
+    public void RemoveCamShakeOnDestructableProjectileEvent(DestructableProjectiles dp)
+    {
+        dp.OnProjectileHit -= (p) => SetTrauma(dp, trauma_enemyOnDeath);
+    }
+    private void SetTrauma(BaseEnemy enemy, float value) => trauma = Mathf.Clamp01(value);
+    private void SetTrauma(PlayerManager enemy, float value) => trauma = Mathf.Clamp01(value);
+    private void SetTrauma(DestructableProjectiles dp, float value) => trauma = Mathf.Clamp01(value);
+
 
     public void AddCamShakeOnDeathEvent()
     {
         PlayerManager.Instance.OnPlayerDied += (p) => SetTrauma(p, trauma_playerOnDeath);
     }
+    public void AddCamShakeOnPlayershot()
+    {
+
+    }
+
     private void Start()
     {
         AddCamShakeOnDeathEvent();
@@ -74,7 +85,6 @@ public class CameraShake : MonoBehaviour
 
         if (trauma > 0f)
         {
-            print("yetr");
             float shake = Mathf.Pow(trauma, traumaPower);
             float time = Time.time * frequency;
 
@@ -115,6 +125,6 @@ public class CameraShake : MonoBehaviour
     }
 
     public void AddTrauma(float amount) => trauma = Mathf.Clamp01(trauma + Mathf.Abs(amount));
-    public void SetTrauma(float value) => trauma = Mathf.Clamp01(value);
+    public void SetTrauma(Player_Weapon p, float value) => trauma = Mathf.Clamp01(value);
     public float GetTrauma() => trauma;
 }

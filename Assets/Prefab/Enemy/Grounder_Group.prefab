@@ -272,8 +272,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   so_baseStats: {fileID: 11400000, guid: e3e3cb1dab756b042ad51759aae7222b, type: 2}
-  _target: {fileID: 0}
-  _rigidbody: {fileID: 0}
   _detectionMask:
     serializedVersion: 2
     m_Bits: 64
@@ -283,4 +281,5 @@ MonoBehaviour:
   - {fileID: 9100370538840121904}
   _vulnerableTime: 5
   _vulnerableThreshold: 0.3
+  _stunDuration: 0.1
   _chase_AfterDetectingOrDamaged: 0

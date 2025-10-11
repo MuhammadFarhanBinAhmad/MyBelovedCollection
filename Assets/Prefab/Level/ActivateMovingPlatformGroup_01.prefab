@@ -187,7 +187,8 @@ MonoBehaviour:
   speed: 4
   startPointIndex: 0
   _waitTime: 1
-  _isActivatedOnPlayerEnter: 0
+  _isActivatedOnPlayerEnter: 1
+  allPlatforms: []
 --- !u!61 &302630306508095324
 BoxCollider2D:
   m_ObjectHideFlags: 0

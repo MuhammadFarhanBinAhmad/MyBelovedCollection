@@ -3,12 +3,14 @@ using UnityEngine;
 
 public class ProjectilePool : MonoBehaviour
 {
-    [SerializeField]
-    GameObject _projectile;
+
+    [SerializeField] GameObject _projectile;
+    [SerializeField] GameObject _destructibleProjectile;
     [SerializeField]
     int _amountToSpawn;
 
     List<GameObject> _projectilepool = new List<GameObject>();
+    List<GameObject> _destructibleProjectilePool = new List<GameObject>();
 
     private void Start()
     {
@@ -16,6 +18,12 @@ public class ProjectilePool : MonoBehaviour
         {
             GameObject proj = Instantiate(_projectile);
             _projectilepool.Add(proj);
+            proj.SetActive(false);
+        }        
+        for (int i = 0; i < _amountToSpawn; i++)
+        {
+            GameObject proj = Instantiate(_destructibleProjectile);
+            _destructibleProjectilePool.Add(proj);
             proj.SetActive(false);
         }
     }
@@ -28,6 +36,19 @@ public class ProjectilePool : MonoBehaviour
             {
                 _projectilepool[i].gameObject.SetActive(true);
                 return _projectilepool[i];
+
+            }
+        }
+        return null;
+    } 
+    public GameObject GetDestructibleProjectile()
+    {
+        for (int i = 0; i < _destructibleProjectilePool.Count; ++i)
+        {
+            if (!_destructibleProjectilePool[i].gameObject.activeInHierarchy)
+            {
+                _destructibleProjectilePool[i].gameObject.SetActive(true);
+                return _destructibleProjectilePool[i];
 
             }
         }

@@ -32,7 +32,8 @@ public class PlayerManager : Character
     [SerializeField] private float _airControlMultiplier = 0.8f;    // Control while in air
     [SerializeField] private float _acceleration = 10f;             // Acceleration rate
     [SerializeField] private float _deceleration = 15f;             // Deceleration when no input
-
+    [SerializeField] ParticleSystem _jumpSmoke;
+    [SerializeField] ParticleSystem _landSmoke;
     private float _coyoteTimeCounter;
     private float _jumpBufferCounter;
 
@@ -43,6 +44,7 @@ public class PlayerManager : Character
     private Rigidbody2D _rigidbody;
     [SerializeField]
     private bool _isGrounded;
+    private bool _wasGrounded;
 
     [Header("Rotation Settings")]
     public float _spinSpeed; // degrees per second
@@ -94,6 +96,7 @@ public class PlayerManager : Character
     EventInstance sfx_PlayerFootStep;
 
 
+
     public bool GetIsDead() => _isDead;
     public bool GetIsDashing() { return _isDashing; }
     public void SetIsDashinag(bool dashing) { _isDashing = dashing; }
@@ -134,18 +137,22 @@ public class PlayerManager : Character
         {
             Movement();
             HandleRotation();
+
+            if (HasAbility(PlayerAbility.WALLJUMP))
+                HandleWallJump();
+
+            if (HasAbility(PlayerAbility.DASH))
+                StartDash();
+
+            if (HasAbility(PlayerAbility.HOMING))
+                StartHomingAttack();
+
+            UpdateSound();
+
         }
-        if (HasAbility(PlayerAbility.WALLJUMP))
-        HandleWallJump();
-
-        if(HasAbility(PlayerAbility.DASH))
-        StartDash();
-
-        if(HasAbility(PlayerAbility.HOMING))
-        StartHomingAttack();
 
 
-        UpdateSound();
+
     }
 
 
@@ -198,11 +205,21 @@ public class PlayerManager : Character
             {
                 _rigidbody.linearVelocity += Vector2.up * Physics2D.gravity.y * (_fallGravityMultiplier - 1) * Time.deltaTime;
             }
-            if (Input.GetButtonDown("Jump"))
+            if (Input.GetButtonDown("Jump") && _isGrounded)
+            {
+                _jumpSmoke.Play();
                 _jumpBufferCounter = _jumpBufferTime;
+            }
             else
                 _jumpBufferCounter -= Time.deltaTime;
         }
+
+        // Landing detection
+        if (!_wasGrounded && _isGrounded)
+        {
+            _landSmoke.Play();
+        }
+        _wasGrounded = _isGrounded;
     }
 
     void HandleRotation()
@@ -433,11 +450,12 @@ public class PlayerManager : Character
     {
         _playerSprite.SetActive(false);
         _rigidbody.simulated = false;
-        _playerCollider.enabled = false;
+        //_playerCollider.enabled = false;
     }
 
     public void ResetStats()
     {
+        _UIManager.DeathFlashScreem();
         _playerCollider.enabled = true;
         _rigidbody.simulated = true;
         transform.position = _respawnZone.transform.position;
