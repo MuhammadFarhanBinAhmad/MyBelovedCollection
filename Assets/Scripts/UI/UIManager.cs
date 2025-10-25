@@ -20,9 +20,21 @@ public class UIManager : UISubject
         StartCoroutine(DisableDeathFlash());
     }
 
+    public void MoveNextRoomFlash()
+    {
+        blackScreen.SetActive(true);
+        StartCoroutine(MoveNextRoomFlashCoroutine());
+    }
+
     IEnumerator DisableDeathFlash()
     {
         yield return new WaitForSeconds(.5f);
+        blackScreen.SetActive(false);
+        PlayerManager.Instance.SetIsDead(false);
+    }
+    IEnumerator MoveNextRoomFlashCoroutine()
+    {
+        yield return new WaitForSeconds(.1f);
         blackScreen.SetActive(false);
     }
 

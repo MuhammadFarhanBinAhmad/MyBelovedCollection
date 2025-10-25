@@ -10,6 +10,7 @@ public class DestructableProjectiles : MonoBehaviour
 {
     Rigidbody2D _rigidbody;
     [SerializeField] TrailRenderer _enemyTrailRenderer, _playerTrailRenderer;
+    [SerializeField] GameObject vfx_hitEffect;
 
     Vector2 _direction;
 
@@ -145,7 +146,7 @@ public class DestructableProjectiles : MonoBehaviour
             {
                 BaseEnemy _re = other.GetComponent<BaseEnemy>();
                 AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_EnemyHit, this.transform.position);
-                _re.TakeDamage(_dmg * 100);
+                _re.TakeDamage(_dmg * 100, this.transform);
                 SelfDestruct();
 
             }
@@ -154,6 +155,17 @@ public class DestructableProjectiles : MonoBehaviour
 
         if (other.tag == "Ground")
         {
+            Vector2 hitDirection = (other.transform.position - transform.position).normalized;
+            Vector2 spawnPos = (Vector2)transform.position + (-hitDirection * 0.3f); // Offset backwards a bit
+
+            if (vfx_hitEffect != null)
+            {
+                GameObject vfx = Instantiate(vfx_hitEffect, spawnPos, Quaternion.identity);
+                // Optional: make it face away from bullet hit direction
+                vfx.transform.right = hitDirection;
+            }
+
+            AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_GeneralProjectileHit, this.transform.position);
             SelfDestruct();
         }
     }

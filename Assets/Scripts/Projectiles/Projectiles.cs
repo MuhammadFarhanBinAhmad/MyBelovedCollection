@@ -18,6 +18,8 @@ public class Projectiles : MonoBehaviour
     public event Action<Projectiles> OnEnemyHit;
     public event Action<Projectiles> OnEnemyDied;
 
+    [SerializeField] GameObject vfx_hitEffect;
+
     Rigidbody2D _rigidbody;
     [SerializeField]TrailRenderer _trailRenderer;
 
@@ -29,6 +31,7 @@ public class Projectiles : MonoBehaviour
     [SerializeField]internal BULLETOWNER _BulletOwner;
     int _dmg, _speed;
 
+    float _generalCamshakevalue;
 
     private void Start()
     {
@@ -78,6 +81,7 @@ public class Projectiles : MonoBehaviour
     internal void SelfDestruct()
     {
         _trailRenderer.Clear();
+        PlayerManager.Instance._roomManager._camShake.AddTrauma(_generalCamshakevalue);
         gameObject.SetActive(false);
     }
 
@@ -110,18 +114,18 @@ public class Projectiles : MonoBehaviour
                     if (other.GetComponent<BaseEnemy>() != null)
                     {
                         BaseEnemy _be = other.GetComponent<BaseEnemy>();
-                        if(_be._hasInvulnerableShield)
+
+                        if (_be._hasInvulnerableShield)
                         {
                             SelfDestruct();
                             AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_EnemyDeflectHit, this.transform.position);
                         }
                         else
                         {
-                            _be.TakeDamage(_dmg);
+                            _be.TakeDamage(_dmg,this.transform);
                             SelfDestruct();
-                            AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_EnemyHit, this.transform.position);
                         }
-
+                        
                     }
                     if(other.GetComponent<DestructableWalls>() != null)
                     {
@@ -133,8 +137,20 @@ public class Projectiles : MonoBehaviour
         }
 
 
-        if (other.tag == "Ground")
+        if (other.tag == "Ground" || other.GetComponent<EnemyShield>() != null)
         {
+
+            Vector2 hitDirection = (other.transform.position - transform.position).normalized;
+            Vector2 spawnPos = (Vector2)transform.position + (-hitDirection * .3f); // Offset backwards a bit
+
+            if (vfx_hitEffect != null)
+            {
+                GameObject vfx = Instantiate(vfx_hitEffect, spawnPos, Quaternion.identity);
+                // Optional: make it face away from bullet hit direction
+                vfx.transform.right = hitDirection;
+            }
+
+            AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_GeneralProjectileHit, this.transform.position);
             SelfDestruct();
         }
     }

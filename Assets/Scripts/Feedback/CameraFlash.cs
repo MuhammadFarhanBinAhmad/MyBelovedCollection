@@ -22,15 +22,15 @@ public class CameraFlash : MonoBehaviour
         // Try unsubscribing if sender has a known event type
         switch (sender)
         {
-            case BaseEnemy enemy:
-                enemy.OnEnemyDied -= HitFlash<BaseEnemy>;
-                break;
-            case PlayerManager player:
-                player.OnPlayerDied -= HitFlash<PlayerManager>;
-                break;
-            case DestructableProjectiles destructableProjectiles:
-                destructableProjectiles.OnProjectileHit -= HitFlash<DestructableProjectiles>;
-                break;
+            //case BaseEnemy enemy:
+            //    enemy.OnEnemyDied -= HitFlash<BaseEnemy>;
+            //    break;
+            //case PlayerManager player:
+            //    player.OnPlayerDied -= HitFlash<PlayerManager>;
+            //    break;
+            //case DestructableProjectiles destructableProjectiles:
+            //    destructableProjectiles.OnProjectileHit -= HitFlash<DestructableProjectiles>;
+            //    break;
         }
 
         if (_flash == null) return;
@@ -42,4 +42,5 @@ public class CameraFlash : MonoBehaviour
             _flash.gameObject.SetActive(false);
         });
     }
+
 }

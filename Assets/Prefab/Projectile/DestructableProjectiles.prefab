@@ -475,5 +475,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _enemyTrailRenderer: {fileID: 3923314990372641920}
   _playerTrailRenderer: {fileID: 8766635705329035214}
+  vfx_hitEffect: {fileID: 2867083975575482286, guid: e4d5106f00c7ffb4098861aa4781d056, type: 3}
   time_tillDisable: 10
   _BulletOwner: 0

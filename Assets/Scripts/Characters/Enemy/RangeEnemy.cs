@@ -73,6 +73,7 @@ public class RangeEnemy : BaseEnemy
                         _proj.SetPosition(proj_SpawnPos.position);
                         _proj.SetDamage(so_projectileStats._damage);
                         _proj.SetSpeed(so_projectileStats._speed);
+                        AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_GreenBayShooting, this.transform.position);
                         break;
                     }
                 case BULLETOWNER.WIZARD:
@@ -85,10 +86,12 @@ public class RangeEnemy : BaseEnemy
                         _proj.SetPosition(proj_SpawnPos.position);
                         _proj.SetDamage(so_projectileStats._damage);
                         _proj.SetSpeed(so_projectileStats._speed);
+                        AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_WizardShooting, this.transform.position);
                         break;
                     }
             }
             _nextAttack = Time.time + _attackRate; // schedule next attack }
+
         }
     }
 

@@ -42,6 +42,8 @@ public class ProjectileTrap : MonoBehaviour
             _proj.SetDamage(so_projectileStats._damage);
             _proj.SetSpeed(so_projectileStats._speed);
 
+            AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_ProjectileTrap,transform.position);
+
             _nextAttack = Time.time + _attackRate; // schedule next attack }
         }
     }

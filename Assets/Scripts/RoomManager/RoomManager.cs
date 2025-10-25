@@ -1,15 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class RoomManager : MonoBehaviour
 {
+
+    UIManager _UIManager;
+
     public List<BaseEnemy> _EnemyList = new List<BaseEnemy> ();
     public List<IResettable> _resettables = new List<IResettable>();
     [SerializeField]internal CameraShake _camShake;
 
     [SerializeField] Transform _respawnPoint;
+
+    private void OnEnable()
+    {
+        if(_UIManager == null)
+            _UIManager = FindAnyObjectByType<UIManager>();
+    }
 
     public void RegisterResettable(IResettable resettable)
     {
@@ -17,14 +27,13 @@ public class RoomManager : MonoBehaviour
             _resettables.Add(resettable);
     }
 
-    public void UnregisterResettable(IResettable resettable)
-    {
-        if (_resettables.Contains(resettable))
-            _resettables.Remove(resettable);
-    }
-
     public void AddEnemyToList(BaseEnemy _enemy)
     {
+        for (int i = 0; i < _EnemyList.Count; i++)
+        {
+            if (_EnemyList[i] == _enemy) return;
+        }
+
         _EnemyList.Add (_enemy);
         _enemy.OnEnemyDied += OnEnemyDeath;
         _camShake.AddCamShakeOnDeathEvent(_enemy);
@@ -36,7 +45,7 @@ public class RoomManager : MonoBehaviour
         if (!_EnemyList.Contains(_enemy))
             return;
         
-        _enemy.gameObject.SetActive (false);
+        //_enemy.gameObject.SetActive(false);
     }
 
     public GameObject GetNearestEnemyToPlayer()
@@ -62,11 +71,24 @@ public class RoomManager : MonoBehaviour
     {
         PlayerManager.Instance._roomManager = this;
         PlayerManager.Instance.SetRespawnZone(_respawnPoint);
-        if (FindAnyObjectByType<Player_Weapon>() != null)
-        {
-            FindAnyObjectByType<Player_Weapon>().SetCameraShake(_camShake);
-        }
+        _UIManager.MoveNextRoomFlash();
 
+
+        //Activate all enemy
+        for(int i=0; i < _EnemyList.Count;i++)
+        {
+            _EnemyList[i].gameObject.SetActive(true);
+            _EnemyList[i]._playerInRoom = true;
+        }
+    }
+    public void ExitRoom()
+    {
+        for (int i = 0; i < _EnemyList.Count; i++)
+        {
+            _EnemyList[i].ResetObject();
+            _EnemyList[i].gameObject.SetActive(false);
+            _EnemyList[i]._playerInRoom = false;
+        }
     }
 
     public void RespawnPlayer() => StartCoroutine(RespawnPlayerCoroutine());

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.03.00">
+	<object class="AudioFile" id="{bf12c75f-8a19-4143-998e-bb3fc8a2ae6e}">
+		<property name="assetPath">
+			<value>SFX/Jingle/Voosh_02.wav</value>
+		</property>
+		<property name="frequencyInKHz">
+			<value>44.0999985</value>
+		</property>
+		<property name="channelCount">
+			<value>1</value>
+		</property>
+		<property name="length">
+			<value>0.99149659863945583</value>
+		</property>
+		<relationship name="masterAssetFolder">
+			<destination>{e7b67b89-4e8a-4777-8f03-ab068ee75027}</destination>
+		</relationship>
+	</object>
+</objects>

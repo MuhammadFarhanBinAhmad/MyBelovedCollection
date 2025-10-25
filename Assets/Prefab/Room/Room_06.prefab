@@ -51,7 +51,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _virtualcamera: {fileID: 4678154738131603119}
-  _CameraShake: {fileID: 0}
   _cineMachineCamera: {fileID: 0}
 --- !u!61 &6756753345712536541
 BoxCollider2D:
@@ -87,7 +86,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -29.635197, y: -6.132578}
+  m_Offset: {x: -27.757416, y: -6.132578}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -97,7 +96,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 26.216316, y: 21.232754}
+  m_Size: {x: 22.460754, y: 21.232754}
   m_EdgeRadius: 0
 --- !u!114 &2905883337685180561
 MonoBehaviour:
@@ -273,7 +272,7 @@ Transform:
   m_GameObject: {fileID: 809347559415947987}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -38.5, y: -0.82, z: 0}
+  m_LocalPosition: {x: -34.68, y: -0.82, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

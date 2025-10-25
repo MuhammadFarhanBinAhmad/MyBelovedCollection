@@ -23,6 +23,8 @@ public class PlayerManager : Character
     [SerializeField]internal RoomManager _roomManager;
     UIManager _UIManager;
 
+    private float _prevHorizontal;
+
     [Header("Jump and Ground Check Settings")]
     public float _jumpForce;
     [SerializeField] private float _fallGravityMultiplier = 2.5f;   // Gravity when falling
@@ -32,8 +34,6 @@ public class PlayerManager : Character
     [SerializeField] private float _airControlMultiplier = 0.8f;    // Control while in air
     [SerializeField] private float _acceleration = 10f;             // Acceleration rate
     [SerializeField] private float _deceleration = 15f;             // Deceleration when no input
-    [SerializeField] ParticleSystem _jumpSmoke;
-    [SerializeField] ParticleSystem _landSmoke;
     private float _coyoteTimeCounter;
     private float _jumpBufferCounter;
 
@@ -47,11 +47,9 @@ public class PlayerManager : Character
     private bool _wasGrounded;
 
     [Header("Rotation Settings")]
-    public float _spinSpeed; // degrees per second
     public float _grounddistance;
     public float base_timegroundcheck;
     public float current_timegroundcheck;
-    int _spinDirection = 1;
 
     [Header("Dash Settings")]
     public TrailRenderer _trail;
@@ -92,12 +90,17 @@ public class PlayerManager : Character
 
     public event UnityAction<PlayerManager> OnPlayerDied;
 
+    [Header("VFX")]
+    [SerializeField] ParticleSystem _jumpSmoke;
+    [SerializeField] ParticleSystem _landSmoke;
+    [SerializeField] ParticleSystem _startStopSmoke;
+
     [Header("Audio")]
     EventInstance sfx_PlayerFootStep;
 
-
-
     public bool GetIsDead() => _isDead;
+    public void SetIsDead(bool status) => _isDead = status;
+
     public bool GetIsDashing() { return _isDashing; }
     public void SetIsDashinag(bool dashing) { _isDashing = dashing; }
     public void SetRespawnZone(Transform _pos) => _respawnZone = _pos;
@@ -158,7 +161,19 @@ public class PlayerManager : Character
 
     void Movement()
     {
-        float horizontal = Input.GetAxis("Horizontal");
+        float horizontal = Input.GetAxisRaw("Horizontal");
+        bool isReleasing = Mathf.Abs(horizontal) < 0.001f && Mathf.Abs(_prevHorizontal) > 0.001f;
+
+        if (isReleasing && _isGrounded)
+        {
+            _startStopSmoke.Play();
+        }
+
+        _prevHorizontal = horizontal; // store for next frame
+
+
+        _IsMoving = Mathf.Abs(horizontal) > 0.001f;
+
 
         if (!_isDashing)
         {
@@ -207,6 +222,7 @@ public class PlayerManager : Character
             }
             if (Input.GetButtonDown("Jump") && _isGrounded)
             {
+                AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_PlayerJump, this.transform.position);
                 _jumpSmoke.Play();
                 _jumpBufferCounter = _jumpBufferTime;
             }
@@ -218,8 +234,23 @@ public class PlayerManager : Character
         if (!_wasGrounded && _isGrounded)
         {
             _landSmoke.Play();
+            AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_PlayerLand, this.transform.position);
         }
         _wasGrounded = _isGrounded;
+
+        // ------------------------------
+        // Start/Stop Walking Smoke
+        // ------------------------------
+        if (_isGrounded) // only play when grounded
+        {
+            // Detect walking start
+            if (!_wasMoving && _IsMoving)
+            {
+                _startStopSmoke.Play();
+            }
+        }
+
+        _wasMoving = _IsMoving; // remember movement state for next frame
     }
 
     void HandleRotation()
@@ -230,11 +261,7 @@ public class PlayerManager : Character
             Quaternion targetRotation = Quaternion.Euler(0, 0, 0);
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
         }
-        else
-        {
-            // Spin in air
-            transform.Rotate(Vector3.forward * _spinSpeed * Time.deltaTime);
-        }
+
         if (_isGrounded)
         {
             current_timegroundcheck = base_timegroundcheck;
@@ -281,7 +308,8 @@ public class PlayerManager : Character
             {
                 _isHoming = true;
                 _dashCurrentCooldownTime = _dashCooldown;
-                _rigidbody.linearVelocity = Vector2.zero;
+                //_rigidbody.linearVelocity = Vector2.zero;
+                _rigidbody.gravityScale = 0;
                 AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_PlayerDashing, transform.position);
                 StartCoroutine(Homing());
             }
@@ -344,16 +372,17 @@ public class PlayerManager : Character
             _rigidbody.linearVelocity = Vector2.zero;
             AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_PlayerDashing,transform.position);
             _trail.gameObject.SetActive(true);
+            _rigidbody.gravityScale = 0;
             StartCoroutine(Dashing());
         }
     }
     IEnumerator Dashing()
     {
         yield return new WaitForSeconds(_dashDuration);
-        _rigidbody.linearVelocity = Vector2.zero;
         _isDashing = false;
         _trail.Clear();
         _trail.gameObject.SetActive(false);
+        _rigidbody.gravityScale = 1;
     }
 
     void CurrentlyDashing()
@@ -460,7 +489,6 @@ public class PlayerManager : Character
         _rigidbody.simulated = true;
         transform.position = _respawnZone.transform.position;
         _playerSprite.SetActive(true);
-        _isDead = false;
         _UIManager.UpdatePlayerUIObserver();
     }
 

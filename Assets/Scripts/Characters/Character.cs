@@ -10,6 +10,10 @@ public class Character : MonoBehaviour
      internal int _BaseSpeed;
      internal int _Speed;
 
+    internal bool _Moving;
+    internal bool _IsMoving;
+    internal bool _wasMoving;
+
     public void OnEnable()
     {
         _BaseHealth = SO_character._BaseHealth;

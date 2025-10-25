@@ -6,7 +6,6 @@ public class RoomCamera : MonoBehaviour
 
     [SerializeField]  GameObject _virtualcamera;
     [SerializeField] CinemachineCamera _cineMachineCamera;
-
     private void OnEnable()
     {
         _cineMachineCamera = _virtualcamera.GetComponent<CinemachineCamera>();
@@ -25,9 +24,13 @@ public class RoomCamera : MonoBehaviour
     }
     private void OnTriggerExit2D(Collider2D other)
     {
+
+
         if (other.CompareTag("Player") && !other.GetComponent<PlayerManager>().GetIsDead())
         {
             _virtualcamera.SetActive(false);
+            //Deactivate all enemy
+            PlayerManager.Instance._roomManager.ExitRoom();
         }
     }
 }

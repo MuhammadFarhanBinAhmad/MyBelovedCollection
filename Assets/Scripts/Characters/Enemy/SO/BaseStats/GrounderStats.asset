@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e6ff60ff6607014e96c327a521adc6f, type: 3}
   m_Name: GrounderStats
   m_EditorClassIdentifier: 
-  _baseSpeed: 5
+  _baseSpeed: 10
   _baseHealth: 5
   _attackRate: 2
   _stopDistance: 3
   _viewrange: 0
   _waitDuration: 0.1
   _chasePlayer: 0
+  _hasInvulnerableShield: 0

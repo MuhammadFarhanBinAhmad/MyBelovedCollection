@@ -63,7 +63,8 @@ public class CameraShake : MonoBehaviour
     }
     private void SetTrauma(BaseEnemy enemy, float value) => trauma = Mathf.Clamp01(value);
     private void SetTrauma(PlayerManager enemy, float value) => trauma = Mathf.Clamp01(value);
-    private void SetTrauma(DestructableProjectiles dp, float value) => trauma = Mathf.Clamp01(value);
+    private void SetTrauma(DestructableProjectiles dp, float value) => trauma = Mathf.Clamp01(value); 
+    private void SetTrauma(float value) => trauma = Mathf.Clamp01(value);
 
 
     public void AddCamShakeOnDeathEvent()

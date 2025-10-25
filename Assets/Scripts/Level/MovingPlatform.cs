@@ -32,13 +32,7 @@ public class MovingPlatform : MonoBehaviour , IResettable
             room.RegisterResettable(this);
     }
 
-    private void OnDisable()
-    {
-        allPlatforms.Remove(this);
-        RoomManager room = GetComponentInParent<RoomManager>();
-        if (room != null)
-            room.UnregisterResettable(this);
-    }
+
     void Start()
     {
         if (points.Length == 0) return;

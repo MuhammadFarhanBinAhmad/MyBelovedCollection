@@ -16,13 +16,6 @@ public class DestructableWalls : MonoBehaviour, IResettable
             room.RegisterResettable(this);
     }
 
-    private void OnDisable()
-    {
-        RoomManager room = GetComponentInParent<RoomManager>();
-        if (room != null)
-            room.UnregisterResettable(this);
-    }
-
     private void Awake()
     {
         col = GetComponent<BoxCollider2D>();

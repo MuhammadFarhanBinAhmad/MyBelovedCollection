@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.03.00">
-	<object class="AudioFile" id="{5778b24a-97ea-4245-aabe-7d64a66bee0d}">
+	<object class="AudioFile" id="{aaf0679c-ae8b-4639-b72e-4683500dfca9}">
 		<property name="assetPath">
-			<value>Player/PlayerJump.wav</value>
+			<value>Enemy/Attack/GreenBayShot.wav</value>
 		</property>
 		<property name="frequencyInKHz">
 			<value>44.0999985</value>
@@ -11,7 +11,7 @@
 			<value>1</value>
 		</property>
 		<property name="length">
-			<value>0.23775510204081632</value>
+			<value>0.1793424036281179</value>
 		</property>
 		<relationship name="masterAssetFolder">
 			<destination>{e7b67b89-4e8a-4777-8f03-ab068ee75027}</destination>

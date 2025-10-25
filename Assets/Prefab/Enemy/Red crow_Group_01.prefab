@@ -283,6 +283,8 @@ MonoBehaviour:
   _vulnerableThreshold: 0
   _stunDuration: 0
   _stunColor: {r: 0, g: 0, b: 0, a: 0}
+  vfx_HitBloodSplatter: {fileID: 4144730742131915754, guid: e81427f7100b1ae4e9b11c0766b11d2d, type: 3}
+  vfx_DeathBloodSplatter: {fileID: 183446196814453655, guid: 7fb0258b51220ac419b9439c6243d925, type: 3}
   _chase_AfterDetectingOrDamaged: 1
   homingSpeed: 6
   dashSpeed: 25

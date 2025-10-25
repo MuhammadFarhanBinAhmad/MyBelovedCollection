@@ -8,6 +8,7 @@ public class Player_UnlockAbility : MonoBehaviour
     {
         if(other.GetComponent<PlayerManager>())
         {
+            AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_NewAbility, this.transform.position);
             PlayerManager.Instance.UnlockAbility(_ability);
             Destroy(this.gameObject);
             //need add event to showcase what they got and some dialouge

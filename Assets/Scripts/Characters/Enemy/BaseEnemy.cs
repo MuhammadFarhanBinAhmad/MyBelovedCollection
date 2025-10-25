@@ -12,7 +12,8 @@ public abstract class BaseEnemy : MonoBehaviour , IResettable
     public enum STATE
     {
         PATROLLING,
-        ATTACKING
+        ATTACKING,
+        DEAD
     }
 
     protected GameObject _target;
@@ -23,6 +24,7 @@ public abstract class BaseEnemy : MonoBehaviour , IResettable
 
     [SerializeField] LayerMask _detectionMask;
     [Header("Combat Stats")]
+    internal bool _playerInRoom;
     protected float _currentSpeed;
     protected float _stopDistance;
     protected float _viewRange;
@@ -46,6 +48,9 @@ public abstract class BaseEnemy : MonoBehaviour , IResettable
     Color _originalColor;
     [SerializeField] Color _stunColor;
 
+
+    [SerializeField] GameObject vfx_HitBloodSplatter;
+    [SerializeField] GameObject vfx_DeathBloodSplatter;
 
     [SerializeField] bool _chase_AfterDetectingOrDamaged = true;
 
@@ -74,17 +79,12 @@ public abstract class BaseEnemy : MonoBehaviour , IResettable
 
         FindAnyObjectByType<Player_Combo>().AddEnemyToComboCountList(this);
         FindAnyObjectByType<CameraFlash>().AddCameraFlashEvent(this);
+        FindAnyObjectByType<SlowMo>().AddSlowmoEffect(this);
 
         RoomManager room = GetComponentInParent<RoomManager>();
         if (room != null)
             room.RegisterResettable(this);
 
-    }
-    private void OnDisable()
-    {
-        RoomManager room = GetComponentInParent<RoomManager>();
-        if (room != null)
-            room.UnregisterResettable(this);
     }
     protected virtual void SetValue()
     {
@@ -99,6 +99,8 @@ public abstract class BaseEnemy : MonoBehaviour , IResettable
     }
     private void Update()
     {
+        if(!_playerInRoom)
+            { return; }
 
         switch (_state)
         {
@@ -111,6 +113,10 @@ public abstract class BaseEnemy : MonoBehaviour , IResettable
             case STATE.ATTACKING:
                 {
                     ChasePlayer();
+                    break;
+                }
+                case STATE.DEAD:
+                {
                     break;
                 }
         }
@@ -139,9 +145,7 @@ public abstract class BaseEnemy : MonoBehaviour , IResettable
                 {
                     // Switch to next patrol point
                     _currentPatrolIndex = (_currentPatrolIndex + 1) % _patrolPosition.Length;
-                    Vector3 localScale = transform.localScale;
-                    localScale.x *= -1;
-                    transform.localScale = localScale;
+                    Flip();
                 }
 
             }
@@ -176,6 +180,17 @@ public abstract class BaseEnemy : MonoBehaviour , IResettable
         Vector2 targetPos = _target.transform.position;
 
         float distance = Vector3.Distance(transform.position, _target.transform.position);
+
+
+        // Determine horizontal direction
+        float directionX = targetPos.x - enemyPos.x;
+
+        // Flip if player is behind enemy
+        if ((directionX > 0 && transform.localScale.x < 0) || (directionX < 0 && transform.localScale.x > 0))
+        {
+            Flip();
+        }
+
         if (Mathf.Abs(distance) >= _stopDistance)
         {
             Vector2 direction = (targetPos - enemyPos).normalized;
@@ -192,9 +207,15 @@ public abstract class BaseEnemy : MonoBehaviour , IResettable
 
     public virtual void AttackPlayer(){}
 
-    public virtual void TakeDamage(int dmg)
+
+
+    public virtual void TakeDamage(int dmg , Transform othertransform)
     {
         _currentHealth -= dmg;
+
+        Vector2 hitDirection = (othertransform.position - transform.position).normalized;
+        Vector2 spawnPos = (Vector2)othertransform.transform.position + (-hitDirection * 0.3f); // Offset backwards a bit
+
         if (_currentHealth > 0)
         {
             // Stop all movement during stun
@@ -206,6 +227,14 @@ public abstract class BaseEnemy : MonoBehaviour , IResettable
             // If enemy can chase after being hit
             _state = STATE.ATTACKING;
             OnEnemyHit?.Invoke(this);
+            AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_EnemyHit, this.transform.position);
+
+            if (vfx_HitBloodSplatter != null)
+            {
+                GameObject vfx = Instantiate(vfx_HitBloodSplatter, spawnPos, Quaternion.identity);
+                // Optional: make it face away from bullet hit direction
+                vfx.transform.forward = hitDirection;
+            }
 
             // Vulnerable check
             if (_currentHealth < so_baseStats._baseHealth * _vulnerableThreshold && !_vulnerable)
@@ -216,8 +245,25 @@ public abstract class BaseEnemy : MonoBehaviour , IResettable
         }
         else
         {
+
+            _state = STATE.DEAD;
+            float knockbackForce = 100000f; // You can expose this as a variable if you want
+            float upwardForce = 5000f;
+            _rigidbody.linearVelocity = Vector2.zero; // Reset before applying
+            _rigidbody.AddForce(-hitDirection * knockbackForce, ForceMode2D.Impulse);
+            _rigidbody.AddForce(Vector2.up * upwardForce, ForceMode2D.Impulse);
             OnEnemyDied?.Invoke(this);
+            AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_EnemyDeath, this.transform.position);
+            StartCoroutine(DeathExplosion());
         }
+    }
+    IEnumerator DeathExplosion()
+    {
+        yield return new WaitForSeconds(.15f);
+        GameObject vfx = Instantiate(vfx_DeathBloodSplatter, transform.position, Quaternion.identity);
+        AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_EnemyDeathExplosion, this.transform.position);
+        gameObject.SetActive(false);
+
     }
     IEnumerator TempStun()
     {
@@ -245,19 +291,18 @@ public abstract class BaseEnemy : MonoBehaviour , IResettable
             _roomManager.AddEnemyToList(this);
 
         }
-        Player_HomingCollider player_hc = other.GetComponent<Player_HomingCollider>();
-        if (player_hc != null)
-        {
-            TakeDamage(_currentHealth);
-            AudioManager.Instance.PlayOneShot(FmodEvent.Instance.sfx_EnemyHit, this.transform.position);
-            PlayerManager.Instance.StopHoming();
-            PlayerManager.Instance.HomingKnockBack();
-        }
+
         PlayerManager player = other.GetComponent<PlayerManager>();
         if (player != null)
         {
             player.TakeDamage();
         }
+    }
+    void Flip()
+    {
+        Vector3 localScale = transform.localScale;
+        localScale.x *= -1;
+        transform.localScale = localScale;
     }
 
     public bool isVulnerable() => _vulnerable;
@@ -282,7 +327,15 @@ public abstract class BaseEnemy : MonoBehaviour , IResettable
         _target = null;
 
         SetValue();
-
         gameObject.SetActive(true); // ensure enemy is active again
+        _spriteRenderer.color= _originalColor;
+        if (_patrolPosition.Length >= 2)
+        {
+            Vector3 targetDir = _patrolPosition[_currentPatrolIndex].position - transform.position;
+            bool shouldFaceRight = targetDir.x > 0;
+
+            if ((shouldFaceRight && transform.localScale.x < 0) || (!shouldFaceRight && transform.localScale.x > 0))
+                Flip();
+        }
     }
 }
